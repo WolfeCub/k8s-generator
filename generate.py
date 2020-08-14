@@ -58,15 +58,17 @@ class CliFunctions(object):
         for path in paths:
             result = self.__render_file(path.absolute(), provider)
 
-            if output_dir is not None:
-                new_path = Path(output_dir).joinpath(path)
-                if path.is_dir():
-                    new_path.mkdir(parents=True, exist_ok=True)
-                else:
-                    with open(new_path, 'w') as f:
-                        f.write(result)
-            else:
+            if output_dir is None:
                 print(result)
+                return
+
+            new_path = Path(output_dir).joinpath(path)
+            if path.is_dir():
+                new_path.mkdir(parents=True, exist_ok=True)
+                return
+
+            with open(new_path, 'w') as f:
+                f.write(result)
 
 if __name__ == '__main__':
     fire.Fire(CliFunctions)
