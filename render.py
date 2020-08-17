@@ -1,6 +1,8 @@
 import os
+import sys
 from pathlib import Path
 
+from jinja2.exceptions import UndefinedError
 from providers.vault import VaultProvider
 from providers.yaml import YamlProvider
 from models.file_data import FileData
@@ -18,24 +20,33 @@ class Render:
 
     def __str__(self):
         self.__render_all_paths()
-        return '' # TODO: This adds an extra empty line to the output
+        sys.exit(0)
 
 
     def __render_all_paths(self, output_dir=None):
         if output_dir is not None:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
+        
+        has_encountered_error = False
 
         for file_data in self.__file_data_list:
-            result = self.__env.from_string(file_data.content).render(self.__vars_fetched_so_far)
+            try:
+                result = self.__env.from_string(file_data.content).render(self.__vars_fetched_so_far)
+            except UndefinedError as e:
+                print(e.message, file=sys.stderr)
+                has_encountered_error = True
+
+            if has_encountered_error:
+                continue
 
             if output_dir is None:
                 print(result)
-                return
+                continue
 
             new_path = Path(output_dir).joinpath(path)
             if path.is_dir():
                 new_path.mkdir(parents=True, exist_ok=True)
-                return
+                continue
 
             with open(new_path, 'w') as f:
                 f.write(result)
