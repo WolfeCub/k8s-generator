@@ -58,9 +58,16 @@ class CliFunctions(object):
                     print('Missing variables', file=sys.stderr)
                     return
 
-                template = self.env.get_template(body['template'])
-                rendered = template.render(body['vars'])
-                print(rendered)
+                templates = body['template'] if isinstance(body['template'], list) else [body['template']]
+                for template in templates:
+                    self.__render_and_output_template(template, body['vars'])
+
+
+    def __render_and_output_template(self, template, variables):
+        template = self.env.get_template(template)
+        rendered = template.render(variables)
+        print(rendered)
+        print('---')
             
 
     def __create_path_list(self, in_file, file_glob):

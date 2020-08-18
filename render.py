@@ -41,10 +41,11 @@ class Render:
 
             if output_dir is None:
                 print(result)
+                print('---')
                 continue
 
-            new_path = Path(output_dir).joinpath(path)
-            if path.is_dir():
+            new_path = Path(output_dir).joinpath(file_data.path)
+            if os.path.isdir(file_data.path):
                 new_path.mkdir(parents=True, exist_ok=True)
                 continue
 
@@ -60,6 +61,7 @@ class Render:
 
         return self.__provider.fetch_variables(variables_to_fetch)
 
+
     def __fetch_and_update_vars_with_provider(self, provider, *vargs):
         self.__provider = provider(self.__config, *vargs)
         var_dict = self.__fetch_vars_from_provider()
@@ -68,8 +70,10 @@ class Render:
 
         return self
 
+
     def vault(self):
         return self.__fetch_and_update_vars_with_provider(VaultProvider)
+
 
     def yaml(self, variables_file):
         return self.__fetch_and_update_vars_with_provider(YamlProvider, variables_file)

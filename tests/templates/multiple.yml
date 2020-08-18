@@ -1,0 +1,7 @@
+template: 
+  - manifest.yml
+  - manifest.yml
+vars:
+    more: than
+    one: variable
+    app_name: yourAppNameHere
