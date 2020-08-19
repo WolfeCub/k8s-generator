@@ -3,7 +3,7 @@ import yaml
 from providers.base_provider import BaseProvider
 
 class YamlProvider(BaseProvider):
-    def __init__(self, config: dict, variables_file: str):
+    def __init__(self, variables_file: str):
         with open(variables_file) as f:
             self.yaml_vars = yaml.safe_load(f.read())
 

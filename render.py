@@ -6,7 +6,7 @@ from jinja2.exceptions import UndefinedError
 from providers.vault import VaultProvider
 from providers.yaml import YamlProvider
 from models.file_data import FileData
-from utils import recursive_dict_update
+from utils import recursive_dict_update, first_valid_or_default
 
 class Render:
     def __init__(self, config, environment, file_data_list):
@@ -26,12 +26,13 @@ class Render:
     def __render_all_paths(self, output_dir=None):
         if output_dir is not None:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
-        
+
         has_encountered_error = False
 
         for file_data in self.__file_data_list:
             try:
-                result = self.__env.from_string(file_data.content).render(self.__vars_fetched_so_far)
+                template = self.__env.from_string(file_data.content)
+                result = template.render(self.__vars_fetched_so_far)
             except UndefinedError as e:
                 print(e.message, file=sys.stderr)
                 has_encountered_error = True
@@ -52,7 +53,7 @@ class Render:
             with open(new_path, 'w') as f:
                 f.write(result)
 
-    
+
     def __fetch_vars_from_provider(self) -> dict:
         variables_to_fetch = set()
 
@@ -62,8 +63,8 @@ class Render:
         return self.__provider.fetch_variables(variables_to_fetch)
 
 
-    def __fetch_and_update_vars_with_provider(self, provider, *vargs):
-        self.__provider = provider(self.__config, *vargs)
+    def __fetch_and_update_vars_with_provider(self, provider):
+        self.__provider = provider
         var_dict = self.__fetch_vars_from_provider()
 
         self.__vars_fetched_so_far = recursive_dict_update(self.__vars_fetched_so_far, var_dict)
@@ -71,9 +72,16 @@ class Render:
         return self
 
 
-    def vault(self):
-        return self.__fetch_and_update_vars_with_provider(VaultProvider)
+    def vault(self, url=None, mount=None, verify=True):
+        config_section = self.__config['vault'] if 'vault' in self.__config else {}
+        url = first_valid_or_default(url, config_section.get('url'))
+        mount = first_valid_or_default(mount, config_section.get('mount_point'))
+        verify = first_valid_or_default(config_section.get('verify'), verify)
+
+        provider = VaultProvider(url, mount, verify)
+        return self.__fetch_and_update_vars_with_provider(provider)
 
 
     def yaml(self, variables_file):
-        return self.__fetch_and_update_vars_with_provider(YamlProvider, variables_file)
+        provider = YamlProvider(variables_file)
+        return self.__fetch_and_update_vars_with_provider(provider)

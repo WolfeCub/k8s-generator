@@ -1,15 +1,22 @@
 import os
 import hvac
-from providers.base_provider import BaseProvider
-
 import urllib3
 
+from providers.base_provider import BaseProvider
+from models.cli_error_exception import CliErrorException
+
 class VaultProvider(BaseProvider):
-    def __init__(self, config):
-        config_section = config['vault']
-        self.url = config_section['url']
-        self.mount_point = config_section['mount_point']
-        self.verify = True if 'verify' not in config_section else config_section['verify']
+    def __init__(self, url, mount_point, verify):
+        self.url = url
+        self.mount_point = mount_point
+        self.verify = verify
+
+        if self.url is None:
+            raise CliErrorException('Vault url cannot be empty')
+        if self.mount_point is None:
+            raise CliErrorException('Vault mount point cannot be empty')
+        if 'VAULT_TOKEN' not in os.environ:
+            raise CliErrorException('VAULT_TOKEN is not set in your environment')
 
         if not self.verify:
             urllib3.disable_warnings()
