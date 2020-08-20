@@ -1,6 +1,4 @@
-template: 
-  - manifest.yml
-  - manifest.yml
+template: ../manifest.yml
 vars:
     more: than
     one: variable
