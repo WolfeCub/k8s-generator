@@ -2,4 +2,4 @@ template: ../manifest.yml
 vars:
     more: than
     one: variable
-    app_name: yourAppNameHere
+    app_name: your-app-name-here

@@ -9,12 +9,13 @@ from models.file_data import FileData
 from utils import recursive_dict_update, first_valid_or_default
 
 class Render:
-    def __init__(self, config, environment, file_data_list):
+    def __init__(self, config, environment, file_data_list, output_dir):
         self.__config = config
         self.__env = environment
         self.__file_data_list = file_data_list
-        self.__vars_fetched_so_far = {}
+        self.__output_dir = output_dir
 
+        self.__vars_fetched_so_far = {}
         self.__provider = None
 
 
@@ -23,9 +24,9 @@ class Render:
         sys.exit(0)
 
 
-    def __render_all_paths(self, output_dir=None):
-        if output_dir is not None:
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
+    def __render_all_paths(self):
+        if self.__output_dir is not None:
+            Path(self.__output_dir).mkdir(parents=True, exist_ok=True)
 
         has_encountered_error = False
 
@@ -40,14 +41,17 @@ class Render:
             if has_encountered_error:
                 continue
 
-            if output_dir is None:
-                print(result)
-                print('---')
+            if self.__output_dir is None:
+                print(f'{result}\n---')
                 continue
 
-            new_path = Path(output_dir).joinpath(file_data.path)
-            if os.path.isdir(file_data.path):
-                new_path.mkdir(parents=True, exist_ok=True)
+            new_path = Path(self.__output_dir).joinpath(file_data.path)
+
+            is_dir = new_path.is_dir()
+            create_path = new_path if is_dir else new_path.parent
+            create_path.mkdir(parents=True, exist_ok=True)
+
+            if is_dir:
                 continue
 
             with open(new_path, 'w') as f:
