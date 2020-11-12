@@ -1,5 +1,0 @@
-fire
-Jinja2
-pyyaml
-hvac[parser]
-colored
