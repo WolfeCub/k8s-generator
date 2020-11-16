@@ -20,6 +20,16 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- ginger >= 0.10
+- text
+- optparse-applicative
+- yaml
+- aeson
+- lens
+- filepath
+- directory
+- unordered-containers
+- mtl
 
 library:
   source-dirs: src

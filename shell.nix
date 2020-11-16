@@ -3,6 +3,7 @@ mkShell {
   buildInputs = [
     stack
     gmp
+    haskellPackages.haskell-language-server
   ];
 }
 

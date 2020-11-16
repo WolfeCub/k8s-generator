@@ -17,7 +17,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -25,13 +24,24 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Cli
+      PlateTypes
   other-modules:
       Paths_plate
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , directory
+    , filepath
+    , ginger >=0.10
+    , lens
+    , mtl
+    , optparse-applicative
+    , text
+    , unordered-containers
+    , yaml
   default-language: Haskell2010
 
 executable plate-exe
@@ -42,8 +52,18 @@ executable plate-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , directory
+    , filepath
+    , ginger >=0.10
+    , lens
+    , mtl
+    , optparse-applicative
     , plate
+    , text
+    , unordered-containers
+    , yaml
   default-language: Haskell2010
 
 test-suite plate-test
@@ -55,6 +75,16 @@ test-suite plate-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , directory
+    , filepath
+    , ginger >=0.10
+    , lens
+    , mtl
+    , optparse-applicative
     , plate
+    , text
+    , unordered-containers
+    , yaml
   default-language: Haskell2010
